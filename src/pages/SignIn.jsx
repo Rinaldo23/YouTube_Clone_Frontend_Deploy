@@ -113,7 +113,7 @@ const SignIn = () => {
             img: result.user.photoURL,
           })
           .then((res) => {
-            console.log(res)
+            // console.log(res)
             dispatch(loginSuccess(res.data));
             localStorage.setItem("access_token", res.data.token);
             navigate("/")

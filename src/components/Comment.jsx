@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -64,13 +65,32 @@ const Comment = ({ comment }) => {
     fetchComment();
   }, [comment.userId]);
 
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`${process.env.REACT_APP_BASE_URL}/comments/${comment.videoId}/${comment._id}/${localStorage.getItem("access_token")}`);
-    } catch (error) {
-      console.log(error)
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation(
+    () => {
+      return axios.delete(`${process.env.REACT_APP_BASE_URL}/comments/${comment.videoId}/${comment._id}/${localStorage.getItem("access_token")}`);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["comments"]);
+      },
     }
+  );
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    mutation.mutate();
   }
+
+  // const handleDelete = async () => {
+  //   try {
+  //     await axios.delete(`${process.env.REACT_APP_BASE_URL}/comments/${comment.videoId}/${comment._id}/${localStorage.getItem("access_token")}`);
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   return (
     <Container>
